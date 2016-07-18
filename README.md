@@ -75,17 +75,18 @@ Add a dependency, do some configuration, maybe add some validation hooks and you
 # Conceptual Model
 
 ```
- Detections -> Evidence -> Evidence Collector -> Evidence Aggregation ->  Response Decider -> Response Action
+Detections -> Evidence -> Evidence Collector -> Evidence Aggregation ->  Response Decider -> Response Action
 ```
 
 A Detection triggers on a certain event, such as an incoming HTTP Request or JSR 303 validation and produces Evidence.
 Evidence may be enriched (for example with the current user, session id or remote IP) before its passed to the Evidence Collector.
 The Evidence Collector logs and groups the evidence by session and IP and aggregates the result, producing an Evidence Aggregation.
+
 This Aggregation is then fed into the Response Decider to determine the Response Action, which may be a rejection of the input, invalidation of the session, temporarily blacklisting of the IP or simply nothing. 
 
 # Alternatives
 
-* [ModSecurity](https://www.modsecurity.org/) - Open Source Web Application Firewall
+* [ModSecurity](https://www.modsecurity.org/) - Open Source Web Application Firewall (for Apache Web Server)
 
 * [OWASP App Sensor](https://www.owasp.org/index.php/OWASP_AppSensor_Project) - Build self-defending applications through real-time event detection and response.
 
