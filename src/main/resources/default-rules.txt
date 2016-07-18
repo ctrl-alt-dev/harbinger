@@ -1,0 +1,16 @@
+# 
+# XSS 
+#
+XSS,MID,<script[^>]*>
+XSS,MID,([\s\"'`;\/0-9\=]+on\w+\s*=)
+XSS,MID,(?:[\s]style=[\s\S]|<style[^>]*>[\s\S]*?|<object[^>]*>[\s\S]*?|<meta[^>]*>[\s\S]*?|<applet[^>]*>[\s\S]*?)
+#
+# File Inclusion
+#
+LFI,MID,(?:\/etc\/|\/..|\\..|web\.xml|boot\.ini\b)
+#
+# SQLi
+#
+SQL,LOW,^'$
+SQL,MID,;[ ]*--
+SQL,MID,['"`] *(or|and) *['"`]
