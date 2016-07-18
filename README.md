@@ -11,14 +11,14 @@ Add a dependency, do some configuration, maybe add some validation hooks and you
 # Features
 
 * Detections
-* * HTTP Request and Response
-* * Bean Validation / JSR-303 support
-* * Exceptions
+  * HTTP Request and Response
+  * Bean Validation / JSR-303 support
+  * Exceptions
 * Responses
-* * None
-* * Reject Input
-* * Invalidate Session
-* * Temporarily Blacklist IP 
+  * None
+  * Reject Input
+  * Invalidate Session
+  * Temporarily Blacklist IP 
 
 # Getting Started
 
