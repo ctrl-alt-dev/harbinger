@@ -19,13 +19,11 @@ import java.io.IOException;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.filter.GenericFilterBean;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import nl.ctrlaltdev.harbinger.HarbingerContext;
 import nl.ctrlaltdev.harbinger.evidence.Evidence;
@@ -34,7 +32,7 @@ import nl.ctrlaltdev.harbinger.evidence.Evidence;
  * collects evidence for each Http Request.
  * Should be placed last the Spring Security Filter Chain.
  */
-public class HttpEvidenceFilter extends GenericFilterBean {
+public class HttpEvidenceFilter extends OncePerRequestFilter {
 
     private HarbingerContext ctx;
 
@@ -42,23 +40,19 @@ public class HttpEvidenceFilter extends GenericFilterBean {
     public HttpEvidenceFilter(HarbingerContext ctx) {
         this.ctx = ctx;
     }
-
+    
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        Evidence evidence = new Evidence();
-        if (request instanceof HttpServletRequest) {
-            evidence = new Evidence(evidence, (HttpServletRequest) request);
-        }
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+            throws ServletException, IOException {
+        Evidence evidence = new Evidence(request);
         try {
             chain.doFilter(request, response);
         } catch (IOException | ServletException | RuntimeException ex) {
             evidence = new Evidence(evidence, ex);
             throw ex;
         } finally {
-            if (response instanceof HttpServletResponse) {
-                Evidence ev = ctx.getEvidenceCollector().store(new Evidence(evidence, (HttpServletResponse) response));
-                ctx.getResponseDecider().decide(ev).perform(ctx);
-            }
+            Evidence ev = ctx.getEvidenceCollector().store(new Evidence(evidence, response));
+            ctx.getResponseDecider().decide(ev).perform(ctx);
         }
     }
 }
