@@ -38,6 +38,7 @@ public class Evidence {
     private String url;
     private int statusCode;
     private DetectionRule rule;
+    private String parameterName;
     private String value;
     private Class<? extends Exception> exceptionType;
     private String exceptionMessage;
@@ -56,6 +57,7 @@ public class Evidence {
         this.url = src.url;
         this.statusCode = src.statusCode;
         this.rule = src.rule;
+        this.parameterName = src.parameterName;
         this.value = src.value;
         this.exceptionMessage = src.exceptionMessage;
         this.exceptionType = src.exceptionType;
@@ -92,6 +94,13 @@ public class Evidence {
     public Evidence(Evidence src, DetectionRule rule, String value) {
         this(src);
         this.rule = rule;
+        this.value = value;
+    }
+
+    public Evidence(Evidence src, DetectionRule rule, String name, String value) {
+        this(src);
+        this.rule = rule;
+        this.parameterName = name;
         this.value = value;
     }
 
@@ -135,6 +144,10 @@ public class Evidence {
 
     public DetectionRule getRule() {
         return rule;
+    }
+
+    public String getParameterName() {
+        return parameterName;
     }
 
     public String getValue() {
@@ -186,6 +199,11 @@ public class Evidence {
         if (rule != null) {
             sb.append("triggered Rule ");
             sb.append(rule.getName());
+            if (parameterName != null) {
+                sb.append(" on parameter '");
+                sb.append(parameterName);
+                sb.append("'");
+            }
             sb.append(" with value '");
             sb.append(DefaultHarbingerContext.filterForLog(value));
             sb.append("' ");

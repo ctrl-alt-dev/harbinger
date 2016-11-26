@@ -16,6 +16,7 @@
 package nl.ctrlaltdev.harbinger.filter;
 
 import java.io.IOException;
+import java.util.Map;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -29,8 +30,8 @@ import nl.ctrlaltdev.harbinger.HarbingerContext;
 import nl.ctrlaltdev.harbinger.evidence.Evidence;
 
 /**
- * collects evidence for each Http Request.
- * Should be placed last the Spring Security Filter Chain.
+ * collects evidence for each Http Request. Should be placed last the Spring
+ * Security Filter Chain.
  */
 public class HttpEvidenceFilter extends OncePerRequestFilter {
 
@@ -40,12 +41,13 @@ public class HttpEvidenceFilter extends OncePerRequestFilter {
     public HttpEvidenceFilter(HarbingerContext ctx) {
         this.ctx = ctx;
     }
-    
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
         Evidence evidence = new Evidence(request);
         try {
+            evidence = analyzeRequest(request, evidence);
             chain.doFilter(request, response);
         } catch (IOException | ServletException | RuntimeException ex) {
             evidence = new Evidence(evidence, ex);
@@ -54,5 +56,16 @@ public class HttpEvidenceFilter extends OncePerRequestFilter {
             Evidence ev = ctx.getEvidenceCollector().store(new Evidence(evidence, response));
             ctx.getResponseDecider().decide(ev).perform(ctx);
         }
+    }
+
+    private Evidence analyzeRequest(HttpServletRequest request, Evidence evidence) {
+        for (Map.Entry<String, String[]> e : request.getParameterMap().entrySet()) {
+            for (String v : e.getValue()) {
+                if (!ctx.isValidParameter(evidence, e.getKey(), v)) {
+
+                }
+            }
+        }
+        return evidence;
     }
 }

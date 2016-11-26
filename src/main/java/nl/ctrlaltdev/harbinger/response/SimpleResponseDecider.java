@@ -19,6 +19,8 @@ import nl.ctrlaltdev.harbinger.evidence.Evidence;
 import nl.ctrlaltdev.harbinger.evidence.EvidenceAggregation;
 import nl.ctrlaltdev.harbinger.evidence.EvidenceCollector;
 import nl.ctrlaltdev.harbinger.rule.DetectionRule.Level;
+import nl.ctrlaltdev.harbinger.whitelist.WhiteList;
+import nl.ctrlaltdev.harbinger.whitelist.builder.WhiteListBuilder;
 
 public class SimpleResponseDecider implements ResponseDecider {
 
@@ -29,19 +31,24 @@ public class SimpleResponseDecider implements ResponseDecider {
     private EvidenceCollector collector;
     private long sessionThreshold;
     private long ipThreshold;
+    private WhiteList whiteList;
 
     public SimpleResponseDecider(EvidenceCollector coll) {
-        this(coll, 42L, 128L);
+        this(coll, 42L, 128L, WhiteListBuilder.empty());
     }
 
-    public SimpleResponseDecider(EvidenceCollector coll, long sessionThreshold, long ipThreshold) {
+    public SimpleResponseDecider(EvidenceCollector coll, long sessionThreshold, long ipThreshold, WhiteList whiteList) {
         this.collector = coll;
         this.sessionThreshold = sessionThreshold;
         this.ipThreshold = ipThreshold;
+        this.whiteList = whiteList;
     }
 
     @Override
     public ResponseAction decide(Evidence ev) {
+        if (whiteList.isWhitelisted(ev)) {
+            return NOACTION;
+        }
         if (ev.getSession() != null) {
             if (score(collector.findBySession(ev)) >= sessionThreshold) {
                 return INVALIDATE_SESSION;

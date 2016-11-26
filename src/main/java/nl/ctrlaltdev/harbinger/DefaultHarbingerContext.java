@@ -71,6 +71,10 @@ public class DefaultHarbingerContext implements HarbingerContext {
 
     @Override
     public boolean isValid(String value) {
+        return isValidInternal(null, null, value);
+    }
+
+    private boolean isValidInternal(Evidence source, String name, String value) {
         if (value == null) {
             return true;
         }
@@ -78,7 +82,10 @@ public class DefaultHarbingerContext implements HarbingerContext {
         value = normalize(value);
         for (DetectionRule rule : rules) {
             if (rule.matches(value)) {
-                evidence = new Evidence(new Evidence(), rule, value);
+                if (source == null) {
+                    source = new Evidence();
+                }
+                evidence = new Evidence(source, rule, name, value);
                 break;
             }
         }
@@ -86,6 +93,11 @@ public class DefaultHarbingerContext implements HarbingerContext {
             return responseDecider.decide(collector.enhanceAndStore(evidence)).perform(this);
         }
         return true;
+    }
+
+    @Override
+    public boolean isValidParameter(Evidence e, String name, String value) {
+        return isValidInternal(e, name, value);
     }
 
     @Override

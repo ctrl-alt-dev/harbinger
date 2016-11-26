@@ -17,11 +17,12 @@ package nl.ctrlaltdev.harbinger;
 
 import java.time.Instant;
 
+import nl.ctrlaltdev.harbinger.evidence.Evidence;
 import nl.ctrlaltdev.harbinger.evidence.EvidenceCollector;
 import nl.ctrlaltdev.harbinger.response.ResponseDecider;
 
 /**
- * Main entry point for the Harbinger API. 
+ * Main entry point for the Harbinger API.
  */
 public interface HarbingerContext {
 
@@ -38,20 +39,29 @@ public interface HarbingerContext {
     /**
      * allows Harbinger to react to user input using JSR-303 bean validation.
      * @param input the input to check against attack signatures.
-     * @return true if the input should be blocked (determined by the ResponseDecider). 
+     * @return false if the input should be blocked (determined by the
+     *         ResponseDecider).
      */
     boolean isValid(String input);
 
     /**
+     * allows Harbinger to react to Servlet API parameters.
+     * @param name the parameter name.
+     * @param value the parameter value.
+     * @return false if the input should be blocked.
+     */
+    boolean isValidParameter(Evidence e, String name, String value);
+
+    /**
      * checks if the given remote address is blacklisted.
      * @param remoteAddr the remote IP address.
-     * @param now the reference instant (addresses are temporarily blacklisted). 
+     * @param now the reference instant (addresses are temporarily blacklisted).
      * @return true if the IP is blacklisted.
      */
     boolean isBlacklisted(String remoteAddr, Instant now);
 
     /**
-     * blacklists the given remote address until the given instant. 
+     * blacklists the given remote address until the given instant.
      * @param remoteAddr the remote address.
      * @param until the instant.
      */
