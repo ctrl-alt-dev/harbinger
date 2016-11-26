@@ -139,5 +139,18 @@ public class EvidenceCollector {
             }
         }
     }
-
+    
+    /**
+     * cleans up the evidence store for the given evidence.
+     * Useful to prevent blacklist loops. 
+     * @param ev the evidence to forget.
+     */
+    public void clean(Evidence ev) {
+        if (ev.getIp()!=null) {
+            evidenceByIp.remove(ev.getIp());
+        }
+        if (ev.getSession()!=null) {
+            evidenceBySession.remove(ev.getSession());
+        }
+    }
 }

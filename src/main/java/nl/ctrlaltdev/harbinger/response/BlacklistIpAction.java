@@ -36,6 +36,7 @@ public class BlacklistIpAction implements ResponseAction {
     @Override
     public boolean perform(HarbingerContext ctx) {
         ctx.blacklist(ev.getIp(), Instant.now().plus(minutes, ChronoUnit.MINUTES));
+        ctx.getEvidenceCollector().clean(ev);
         return true;
     }
 }

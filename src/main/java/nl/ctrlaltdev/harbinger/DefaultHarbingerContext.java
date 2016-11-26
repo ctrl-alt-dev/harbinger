@@ -64,6 +64,7 @@ public class DefaultHarbingerContext implements HarbingerContext {
         return collector;
     }
 
+    @Override
     public ResponseDecider getResponseDecider() {
         return responseDecider;
     }

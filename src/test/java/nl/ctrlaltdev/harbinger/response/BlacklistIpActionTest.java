@@ -15,6 +15,7 @@
  */
 package nl.ctrlaltdev.harbinger.response;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -47,5 +48,18 @@ public class BlacklistIpActionTest {
         assertTrue(action.perform(ctx));
         assertTrue(ctx.isBlacklisted("8.8.8.8", Instant.now()));
         assertFalse(ctx.isBlacklisted("8.8.8.8", Instant.now().plusSeconds(61)));
+    }
+
+    @Test
+    public void shouldCleanEvidenceAfterBlacklisting() {
+        Evidence src = new Evidence(request);
+        Evidence trigger = new Evidence(src, new RuntimeException());
+        ctx.getEvidenceCollector().store(trigger);
+        assertEquals(1, ctx.getEvidenceCollector().findByIp(trigger).getExceptions());
+
+        assertTrue(action.perform(ctx));
+        assertTrue(ctx.isBlacklisted("8.8.8.8", Instant.now()));
+
+        assertEquals(0, ctx.getEvidenceCollector().findByIp(src).getExceptions());
     }
 }
