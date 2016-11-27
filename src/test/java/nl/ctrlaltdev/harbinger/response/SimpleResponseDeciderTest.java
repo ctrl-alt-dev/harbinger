@@ -23,20 +23,17 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import nl.ctrlaltdev.harbinger.evidence.Evidence;
 import nl.ctrlaltdev.harbinger.evidence.EvidenceCollector;
 import nl.ctrlaltdev.harbinger.rule.DetectionRule;
-import nl.ctrlaltdev.harbinger.whitelist.WhiteList;
-import nl.ctrlaltdev.harbinger.whitelist.builder.WhiteListBuilder;
 
 public class SimpleResponseDeciderTest {
 
     private EvidenceCollector coll = new EvidenceCollector();
-    private WhiteList emptyWhiteList = WhiteListBuilder.empty();
     private MockHttpServletRequest request = new MockHttpServletRequest();
     private DetectionRule rule = new DetectionRule(new String[] { "Bad", "HIGH", "" });
     private Evidence ev = new Evidence(request);
 
     @Test
     public void shouldDecideNoAction() {
-        SimpleResponseDecider decider = new SimpleResponseDecider(coll, 1, 1, emptyWhiteList);
+        SimpleResponseDecider decider = new SimpleResponseDecider(coll, 1, 1);
 
         assertTrue(decider.decide(ev) instanceof NoAction);
     }
@@ -44,7 +41,7 @@ public class SimpleResponseDeciderTest {
     @Test
     public void shouldDecideBlacklistIPAction() {
         coll.store(new Evidence(ev, rule, ""));
-        SimpleResponseDecider decider = new SimpleResponseDecider(coll, 1, 1, emptyWhiteList);
+        SimpleResponseDecider decider = new SimpleResponseDecider(coll, 1, 1);
         assertTrue(decider.decide(ev) instanceof BlacklistIpAction);
     }
 
@@ -54,7 +51,7 @@ public class SimpleResponseDeciderTest {
         Evidence evidence = new Evidence(new Evidence(request), rule, "");
         coll.store(evidence);
 
-        SimpleResponseDecider decider = new SimpleResponseDecider(coll, 1, 1, emptyWhiteList);
+        SimpleResponseDecider decider = new SimpleResponseDecider(coll, 1, 1);
         assertTrue(decider.decide(evidence) instanceof InvalidateSessionAction);
     }
 
@@ -63,16 +60,7 @@ public class SimpleResponseDeciderTest {
         Evidence evidence = new Evidence(new Evidence(), rule, "");
         coll.store(evidence);
 
-        SimpleResponseDecider decider = new SimpleResponseDecider(coll, 1, 1, emptyWhiteList);
+        SimpleResponseDecider decider = new SimpleResponseDecider(coll, 1, 1);
         assertTrue(decider.decide(evidence) instanceof RejectInputAction);
     }
-
-    @Test
-    public void shouldTakeNoActionOnWhitelistedRequests() {
-        coll.store(new Evidence(ev, rule, ""));
-        WhiteList whitelist = WhiteListBuilder.create().ip("127.0.0.1").build();
-        SimpleResponseDecider decider = new SimpleResponseDecider(coll, 1, 1, whitelist);
-        assertTrue(decider.decide(ev) instanceof NoAction);
-    }
-
 }

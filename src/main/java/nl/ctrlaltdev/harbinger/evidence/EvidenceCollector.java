@@ -26,16 +26,26 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import nl.ctrlaltdev.harbinger.whitelist.WhiteList;
+import nl.ctrlaltdev.harbinger.whitelist.builder.WhiteListBuilder;
+
 public class EvidenceCollector {
 
     private Logger LOGGER = LoggerFactory.getLogger(getClass());
+
+    private WhiteList whiteList;
 
     private Map<String, EvidenceAggregation> evidenceByIp;
     private Map<String, EvidenceAggregation> evidenceBySession;
 
     public EvidenceCollector() {
-        evidenceByIp = new ConcurrentHashMap<>();
-        evidenceBySession = new ConcurrentHashMap<>();
+        this(WhiteListBuilder.empty());
+    }
+
+    public EvidenceCollector(WhiteList whiteList) {
+        this.whiteList = whiteList;
+        this.evidenceByIp = new ConcurrentHashMap<>();
+        this.evidenceBySession = new ConcurrentHashMap<>();
     }
 
     public Evidence enhanceAndStore(Evidence evidence) {
@@ -66,6 +76,10 @@ public class EvidenceCollector {
     public Evidence store(Evidence evidence) {
         if (isWarning(evidence)) {
             LOGGER.warn(evidence.toString());
+        }
+        if (whiteList.isWhitelisted(evidence)) {
+            LOGGER.info("Ignoring whitelisted evidence.");
+            return new Evidence();
         }
         if (evidence.getIp() != null) {
             store(evidenceByIp, evidence.getIp(), evidence);

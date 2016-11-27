@@ -31,6 +31,8 @@ import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import nl.ctrlaltdev.harbinger.whitelist.builder.WhiteListBuilder;
+
 public class EvidenceCollectorTest {
 
     private EvidenceCollector collector = new EvidenceCollector();
@@ -98,6 +100,16 @@ public class EvidenceCollectorTest {
 
         assertEquals(1, collector.findByIp(evidence).getNumberOfRequests());
         assertEquals(1, collector.findBySession(evidence).getNumberOfRequests());
+    }
+
+    @Test
+    public void shouldNotStoreWhiteListedEvidence() {
+        collector = new EvidenceCollector(WhiteListBuilder.create().ip("8.8.8.8").build());
+
+        evidence = new Evidence(new Evidence(evidence, request), response);
+        evidence = collector.store(evidence);
+
+        assertEquals(0, collector.findByIp(evidence).getNumberOfRequests());
     }
 
 }
