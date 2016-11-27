@@ -32,6 +32,11 @@ public class WhiteListTest {
     private DetectionRule rule = new DetectionRule(new String[] { "", "MID", ".*" });
 
     @Test
+    public void emptyShouldReturnFalse() {
+        assertFalse(WhiteListBuilder.empty().isWhitelisted(new Evidence(request)));
+    }
+
+    @Test
     public void shouldWhiteListIP() {
         request.setRemoteAddr("8.8.8.8");
         assertTrue(new IpWhiteList("8.8.8.8").isWhitelisted(new Evidence(request)));

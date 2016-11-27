@@ -46,26 +46,29 @@ public class HttpEvidenceFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
         Evidence evidence = new Evidence(request);
-        try {
-            evidence = analyzeRequest(request, evidence);
-            chain.doFilter(request, response);
-        } catch (IOException | ServletException | RuntimeException ex) {
-            evidence = new Evidence(evidence, ex);
-            throw ex;
-        } finally {
-            Evidence ev = ctx.getEvidenceCollector().store(new Evidence(evidence, response));
-            ctx.getResponseDecider().decide(ev).perform(ctx);
+        if (isValid(request, evidence)) {
+            try {
+                chain.doFilter(request, response);
+            } catch (IOException | ServletException | RuntimeException ex) {
+                evidence = new Evidence(evidence, ex);
+                throw ex;
+            } finally {
+                Evidence ev = ctx.getEvidenceCollector().store(new Evidence(evidence, response));
+                ctx.getResponseDecider().decide(ev).perform(ctx);
+            }
+        } else {
+            response.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
         }
     }
 
-    private Evidence analyzeRequest(HttpServletRequest request, Evidence evidence) {
+    private boolean isValid(HttpServletRequest request, Evidence evidence) {
         for (Map.Entry<String, String[]> e : request.getParameterMap().entrySet()) {
             for (String v : e.getValue()) {
                 if (!ctx.isValidParameter(evidence, e.getKey(), v)) {
-
+                    return false;
                 }
             }
         }
-        return evidence;
+        return true;
     }
 }

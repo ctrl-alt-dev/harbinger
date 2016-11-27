@@ -36,7 +36,7 @@ public class WhiteListBuilder {
     }
 
     public static WhiteList empty() {
-        return new AndWhiteList();
+        return new OrWhiteList();
     }
 
     public static WhiteListBuilder create() {

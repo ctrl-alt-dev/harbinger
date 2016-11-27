@@ -201,7 +201,7 @@ public class Evidence {
             sb.append(rule.getName());
             if (parameterName != null) {
                 sb.append(" on parameter '");
-                sb.append(parameterName);
+                sb.append(DefaultHarbingerContext.filterForLog(parameterName));
                 sb.append("'");
             }
             sb.append(" with value '");

@@ -1,0 +1,7 @@
+#
+# Comments
+#
+and(ip:127.0.0.1,user:admin)
+and(ip:127.0.0.1,parameter:test)
+
+or(ip:127.0.0.2,ip:127.0.0.3)

@@ -12,6 +12,7 @@ Add a dependency, do some configuration, maybe add some validation hooks and you
 
 * Detections
   * HTTP Request and Response
+  * Servlet request parameters
   * Bean Validation / JSR-303 support
   * Exceptions
 * Responses
@@ -19,6 +20,9 @@ Add a dependency, do some configuration, maybe add some validation hooks and you
   * Reject Input
   * Invalidate Session
   * Temporarily Blacklist IP 
+* Other
+  * White List for IPs, URLs, Users and Request Parameters
+  * Customizable Detection Rules    
 
 # Getting Started
 
@@ -71,11 +75,15 @@ Add a dependency, do some configuration, maybe add some validation hooks and you
 
 * Use the `@Tripwired` annotation to detect potentially malicious input on `@Valid` Forms or DTOs.
 * Implement your own `ResponseDecider`
+* Add a `WhiteList` to suppress False Positives 
 
 # Conceptual Model
 
 ```
 Detections -> Evidence -> Evidence Collector -> Evidence Aggregation ->  Response Decider -> Response Action
+                                                                                 ^
+                                                                                 |
+                                                                            White List
 ```
 
 A Detection triggers on a certain event, such as an incoming HTTP Request or JSR 303 validation and produces Evidence.
@@ -83,6 +91,10 @@ Evidence may be enriched (for example with the current user, session id or remot
 The Evidence Collector logs and groups the evidence by session and IP and aggregates the result, producing an Evidence Aggregation.
 
 This Aggregation is then fed into the Response Decider to determine the Response Action, which may be a rejection of the input, invalidation of the session, temporarily blacklisting of the IP or simply nothing. 
+
+Sometimes False Positives may trigger an unwanted Response Action from Harbinger. 
+In these cases you use the White List to let the Response Decider ignore any Evidence that matches certain characteristics.
+The White List supports suppressing evidence based on IP address, URL, parameter name and user. Also it supports the boolean OR and AND operators.   
 
 # Alternatives
 

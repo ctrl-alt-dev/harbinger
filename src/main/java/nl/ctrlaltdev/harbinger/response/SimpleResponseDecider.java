@@ -15,6 +15,9 @@
  */
 package nl.ctrlaltdev.harbinger.response;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import nl.ctrlaltdev.harbinger.evidence.Evidence;
 import nl.ctrlaltdev.harbinger.evidence.EvidenceAggregation;
 import nl.ctrlaltdev.harbinger.evidence.EvidenceCollector;
@@ -23,6 +26,8 @@ import nl.ctrlaltdev.harbinger.whitelist.WhiteList;
 import nl.ctrlaltdev.harbinger.whitelist.builder.WhiteListBuilder;
 
 public class SimpleResponseDecider implements ResponseDecider {
+
+    private Logger LOGGER = LoggerFactory.getLogger(getClass());
 
     private static final NoAction NOACTION = new NoAction();
     private static final InvalidateSessionAction INVALIDATE_SESSION = new InvalidateSessionAction();
@@ -47,6 +52,7 @@ public class SimpleResponseDecider implements ResponseDecider {
     @Override
     public ResponseAction decide(Evidence ev) {
         if (whiteList.isWhitelisted(ev)) {
+            LOGGER.info("No Action for WhiteListed evidence " + ev);
             return NOACTION;
         }
         if (ev.getSession() != null) {
@@ -65,7 +71,7 @@ public class SimpleResponseDecider implements ResponseDecider {
         return NOACTION;
     }
 
-    private long score(EvidenceAggregation agg) {
+    protected long score(EvidenceAggregation agg) {
         long score = 0;
         score += agg.getDetections();
         score += agg.getHttp5xx();

@@ -15,7 +15,6 @@
  */
 package nl.ctrlaltdev.harbinger.whitelist;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import nl.ctrlaltdev.harbinger.evidence.Evidence;
@@ -25,10 +24,6 @@ import nl.ctrlaltdev.harbinger.evidence.Evidence;
  */
 public class AndWhiteList implements WhiteList {
     private List<WhiteList> whitelist;
-
-    public AndWhiteList() {
-        this(new ArrayList<>());
-    }
 
     public AndWhiteList(List<WhiteList> whitelist) {
         this.whitelist = whitelist;

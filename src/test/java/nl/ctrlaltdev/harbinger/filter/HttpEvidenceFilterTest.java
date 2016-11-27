@@ -22,6 +22,7 @@ import java.util.Set;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -102,6 +103,36 @@ public class HttpEvidenceFilterTest {
         assertEquals(0, collector.findByIp(new Evidence(request)).getHttp2xx());
         assertEquals(0, collector.findByIp(new Evidence(request)).getHttp5xx());
         assertEquals(1, collector.findByIp(new Evidence(request)).getExceptions());
+    }
+    
+    @Test
+    public void shouldRejectBadParameters() throws IOException, ServletException {
+        request.setRemoteAddr("8.8.8.8");
+        request.addParameter("name", new String[] { "' or '1'='1" });
+
+        filter.doFilter(request, response, chain);
+    
+        assertEquals(5, collector.findByIp(new Evidence(request)).getDetections());
+        // The request is aborted, so there isn't a complete request.
+        assertEquals(0, collector.findByIp(new Evidence(request)).getNumberOfRequests());
+        assertEquals(0, collector.findByIp(new Evidence(request)).getExceptions());
+
+        assertEquals(HttpServletResponse.SC_SERVICE_UNAVAILABLE, response.getStatus());
+    }
+
+    @Test
+    public void shouldPassGoodParameters() throws IOException, ServletException {
+        new Expectations() {{
+                chain.doFilter(request, response);
+            }};
+        request.setRemoteAddr("8.8.8.8");
+        request.addParameter("name", new String[] { "somewhere", "overtherainbow" });
+
+        filter.doFilter(request, response, chain);
+
+        assertEquals(0, collector.findByIp(new Evidence(request)).getDetections());
+        assertEquals(1, collector.findByIp(new Evidence(request)).getNumberOfRequests());
+        assertEquals(0, collector.findByIp(new Evidence(request)).getExceptions());
     }
 
 }
