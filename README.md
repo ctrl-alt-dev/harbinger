@@ -74,16 +74,17 @@ Add a dependency, do some configuration, maybe add some validation hooks and you
 ## Next steps
 
 * Use the `@Tripwired` annotation to detect potentially malicious input on `@Valid` Forms or DTOs.
-* Implement your own `ResponseDecider`
-* Add a `WhiteList` to suppress False Positives 
+* Implement your own `ResponseDecider`.
+* Add a `WhiteList` to the `EvidenceCollector` to suppress False Positives.
+* Write your own Detection Rules.
 
 # Conceptual Model
 
 ```
 Detections -> Evidence -> Evidence Collector -> Evidence Aggregation ->  Response Decider -> Response Action
-                                                                                 ^
-                                                                                 |
-                                                                            White List
+                                  ^
+                                  |
+                             White List
 ```
 
 A Detection triggers on a certain event, such as an incoming HTTP Request or JSR 303 validation and produces Evidence.
@@ -93,7 +94,7 @@ The Evidence Collector logs and groups the evidence by session and IP and aggreg
 This Aggregation is then fed into the Response Decider to determine the Response Action, which may be a rejection of the input, invalidation of the session, temporarily blacklisting of the IP or simply nothing. 
 
 Sometimes False Positives may trigger an unwanted Response Action from Harbinger. 
-In these cases you use the White List to let the Response Decider ignore any Evidence that matches certain characteristics.
+In these cases you use the White List to let the Evidence Collector ignore any Evidence that matches certain characteristics.
 The White List supports suppressing evidence based on IP address, URL, parameter name and user. Also it supports the boolean OR and AND operators.   
 
 # Alternatives
