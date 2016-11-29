@@ -69,7 +69,7 @@ public class EvidenceCollector {
     }
 
     /**
-     * stores evidence temporarily.
+     * Stores evidence temporarily.
      * @param evidence the evidence.
      * @return the aggregated evidence.
      */
@@ -107,8 +107,9 @@ public class EvidenceCollector {
     }
 
     /**
-     * @param ip the ip.
-     * @return the evidence by ip.
+     * Finds the evidenceAggregation by IP.
+     * @param ev the evidence that holds the ip you're looking for.
+     * @return the evidenceAggregation by ip.
      */
     public EvidenceAggregation findByIp(Evidence ev) {
         EvidenceAggregation defaultValue = new EvidenceAggregation(ev);
@@ -120,7 +121,8 @@ public class EvidenceCollector {
     }
 
     /**
-     * @param session the session.
+     * Finds the eveidenceAggregation by sessionId.
+     * @param ev the evidence that holds the session you're looking for.
      * @return the evidence by session.
      */
     public EvidenceAggregation findBySession(Evidence ev) {
@@ -137,7 +139,7 @@ public class EvidenceCollector {
     }
 
     /**
-     * cleans up any evidence from memory with a timestamp before ref.
+     * Cleans up any evidence from memory with a timestamp before ref.
      * @param ref the reference timestamp.
      */
     public void clean(Instant ref) {
@@ -155,8 +157,8 @@ public class EvidenceCollector {
     }
     
     /**
-     * cleans up the evidence store for the given evidence.
-     * Useful to prevent blacklist loops. 
+     * Cleans up the evidence store for the given evidence. Useful to prevent
+     * blacklist loops.
      * @param ev the evidence to forget.
      */
     public void clean(Evidence ev) {

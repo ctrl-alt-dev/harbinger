@@ -28,8 +28,6 @@ Add a dependency, do some configuration, maybe add some validation hooks and you
 
 ## 1) Include Harbinger in your dependencies.
 
-(when it is released, for now, build it from source :-)
-
 ```xml
         <dependency>
             <groupId>nl.ctrlaltdev.harbinger</groupId>
@@ -111,5 +109,8 @@ The White List supports suppressing evidence based on IP address, URL, parameter
 
 # Releases
 
-None Yet!
+### 1.0.0 - 2016-11-29 
+
+* First Release
+
 	
