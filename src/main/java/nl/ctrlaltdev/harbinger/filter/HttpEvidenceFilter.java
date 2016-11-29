@@ -23,23 +23,37 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import nl.ctrlaltdev.harbinger.HarbingerContext;
 import nl.ctrlaltdev.harbinger.evidence.Evidence;
 
 /**
- * collects evidence for each Http Request. Should be placed last the Spring
+ * Collects evidence for each HTTP Request. Should be placed last the Spring
  * Security Filter Chain.
  */
 public class HttpEvidenceFilter extends OncePerRequestFilter {
 
     private HarbingerContext ctx;
+    private boolean validateRequestParameters;
 
-    @Autowired
+    /**
+     * Creates a new HttpEvidenceFilter that validates all request parameters.
+     * @param ctx the Harbinger Context.
+     */
     public HttpEvidenceFilter(HarbingerContext ctx) {
+        this(ctx, true);
+    }
+
+    /**
+     * Creates a new HttpEvidenceFilter.
+     * @param ctx the HarbingerContext.
+     * @param validateRequestParameters if true, Harbinger checks all request
+     *        parameters for malicious input.
+     */
+    public HttpEvidenceFilter(HarbingerContext ctx, boolean validateRequestParameters) {
         this.ctx = ctx;
+        this.validateRequestParameters = validateRequestParameters;
     }
 
     @Override
@@ -62,10 +76,12 @@ public class HttpEvidenceFilter extends OncePerRequestFilter {
     }
 
     private boolean isValid(HttpServletRequest request, Evidence evidence) {
-        for (Map.Entry<String, String[]> e : request.getParameterMap().entrySet()) {
-            for (String v : e.getValue()) {
-                if (!ctx.isValidParameter(evidence, e.getKey(), v)) {
-                    return false;
+        if (validateRequestParameters) {
+            for (Map.Entry<String, String[]> e : request.getParameterMap().entrySet()) {
+                for (String v : e.getValue()) {
+                    if (!ctx.isValidParameter(evidence, e.getKey(), v)) {
+                        return false;
+                    }
                 }
             }
         }

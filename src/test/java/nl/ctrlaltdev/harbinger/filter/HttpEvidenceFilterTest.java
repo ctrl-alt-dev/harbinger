@@ -135,4 +135,20 @@ public class HttpEvidenceFilterTest {
         assertEquals(0, collector.findByIp(new Evidence(request)).getExceptions());
     }
 
+    @Test
+    public void shouldIgnoreBadParametersWhenNotChecking() throws IOException, ServletException {
+        filter = new HttpEvidenceFilter(context, false);
+
+        request.setRemoteAddr("8.8.8.8");
+        request.addParameter("name", new String[] { "' or '1'='1" });
+
+        filter.doFilter(request, response, chain);
+
+        assertEquals(0, collector.findByIp(new Evidence(request)).getDetections());
+        assertEquals(1, collector.findByIp(new Evidence(request)).getNumberOfRequests());
+        assertEquals(0, collector.findByIp(new Evidence(request)).getExceptions());
+
+        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+    }
+
 }
