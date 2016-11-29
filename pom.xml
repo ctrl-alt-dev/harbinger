@@ -6,7 +6,7 @@
 
     <groupId>nl.ctrlaltdev</groupId>
     <artifactId>harbinger</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Harbinger</name>
     <description>A Spring MVC/Security based Web Application Intrusion Detection and Defense Framework.</description>
